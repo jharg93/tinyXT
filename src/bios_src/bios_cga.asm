@@ -1,7 +1,7 @@
 ; BIOS source for 8086tiny IBM PC emulator (revision 1.25 and above). Compiles with NASM.
 ; Copyright 2013-14, Adrian Cable (adrian.cable@gmail.com) - http://www.megalith.co.uk/8086tiny
 ;
-; Revision 2.34
+; Revision 2.40
 ;
 ; Modified by Julian Olds to work with CGA and provide more complete BIOS functions.
 ;
@@ -59,8 +59,8 @@ main:
 
 ; These values (BIOS ID string, BIOS date and so forth) go at the very top of memory
 
-biosstr	db	'8086tiny BIOS Revision 2.25!', 0, 0		; Why not?
-mem_top	db	0xea, 0, 0x01, 0, 0xf0, '03/26/14', 0, 0xfe, 0
+biosstr	db	'8086tiny BIOS Revision 2.40!', 0, 0		; Why not?
+mem_top	db	0xea, 0, 0x01, 0, 0xf0, '11/04/21', 0, 0xfe, 0
 
 bios_entry:
 
@@ -3867,9 +3867,11 @@ clear_window:
 	; bl = number of rows in the window to clear
 	mov	bl, dh
 	sub	bl, ch
+	inc	bl
+	mov	dh, bh
 	shl	bl, 1
 	shl	bl, 1
-
+	
 	; cx = number of words to clear
 	push	ax
 	mov	ax, 0
@@ -3886,7 +3888,8 @@ clear_window:
 	push	di
 	mov	ax, 0xb800
 	mov	es, ax
-	mov	ax, 0
+	mov	al, dh
+	mov	ah, dh
 	rep	stosw
 	pop	di
 	pop	cx
@@ -3895,7 +3898,8 @@ clear_window:
 	push	di
 	mov	ax, 0xba00
 	mov	es, ax
-	mov	ax, 0
+	mov	al, dh
+	mov	ah, dh
 	rep	stosw
 	pop	di
 	pop	cx
@@ -3920,6 +3924,8 @@ clear_window:
 	; bl = number of rows in the window to clear
 	mov	bl, dh
 	sub	bl, ch
+	inc	bl
+	mov	dh, bh
 	shl	bl, 1
 	shl	bl, 1
 
@@ -3937,7 +3943,7 @@ clear_window:
 	push	di
 	mov	ax, 0xb800
 	mov	es, ax
-	mov	ax, 0
+	mov	al, dh
 	rep	stosb
 	pop	di
 	pop	cx
@@ -3946,7 +3952,7 @@ clear_window:
 	push	di
 	mov	ax, 0xba00
 	mov	es, ax
-	mov	ax, 0
+	mov	al, dh
 	rep	stosb
 	pop	di
 	pop	cx
@@ -3973,6 +3979,7 @@ clear_window:
 	; bx = number of rows in the window to clear
 	mov	bl, dh
 	sub	bl, ch
+	mov	dh, bh
 	mov	bh, 0
 	shl	bx, 1
 	shl	bx, 1
@@ -4027,6 +4034,8 @@ clear_window:
 	; bx = number of rows in the window to clear
 	mov	bl, dh
 	sub	bl, ch
+	inc	bl
+	mov	dh, bh
 	mov	bh, 0
 	shl	bx, 1
 	shl	bx, 1
@@ -4051,7 +4060,7 @@ clear_window:
     clear_window_mode13_loop:
 	push	cx
 	push	di
-	mov	ax, 0
+	mov	al, dh
 	rep	stosb
 	pop	di
 	pop	cx
